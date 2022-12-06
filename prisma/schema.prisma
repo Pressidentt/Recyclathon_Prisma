@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+}
+
+model BinType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  bins        Bin[]
+}
+
+model Bin {
+  id   Int     @id @default(autoincrement())
+  long String
+  lat  String
+  binType BinType @relation(fields: [binTypeId], references: [id])
+  binTypeId Int
+  material Material @relation(fields: [materialId], references: [id])
+  materialId Int
+}
+
+model Item {
+  id   Int     @id @default(autoincrement())
+  name String
+  material Material @relation(fields: [materialId], references: [id])
+  materialId Int
+}
+
+model Material {
+  id   Int     @id @default(autoincrement())
+  name String
+  items Item[]
+  bins Bin[]
+}
