@@ -1,4 +1,3 @@
-import { applyIsOptionalDecorator } from "@nestjs/mapped-types";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateBinDto {
@@ -11,4 +10,12 @@ export class CreateBinDto {
     @IsNotEmpty()
     lat: string;
 
-    }
+    @IsNumber()
+    @IsNotEmpty()
+    binTypeId: number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    materialId: number;
+
+}

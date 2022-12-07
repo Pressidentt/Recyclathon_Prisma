@@ -24,11 +24,11 @@ model BinType {
 
 model Bin {
   id   Int     @id @default(autoincrement())
-  long String
-  lat  String
-  binType BinType @relation(fields: [binTypeId], references: [id])
+  long Float
+  lat  Float 
+  binType BinType? @relation(fields: [binTypeId], references: [id])
   binTypeId Int
-  material Material @relation(fields: [materialId], references: [id])
+  material Material? @relation(fields: [materialId], references: [id])
   materialId Int
 }
 
