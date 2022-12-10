@@ -31,10 +31,7 @@ export class FileController {
 
     }))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    console.log('test')
-    console.log(file.path);
-    await this.aiLogicServce.sendImageToApi('https://api.imagga.com/v2/uploads',file); 
+    return await this.aiLogicServce.sendImageToApi('https://api.imagga.com/v2/uploads',file); 
   }
 }
 

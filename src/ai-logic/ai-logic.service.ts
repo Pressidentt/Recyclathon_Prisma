@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { lastValueFrom, Observable, pipe, map } from 'rxjs';
 import * as fs from 'fs';
 import * as FormData from 'form-data'
+import { ItemService } from '../item/item.service';
+import { PrismaService } from '../prisma.service';
 
 const PUBLIC_KEY = ''
 const PRIVATE_KEY = ''
@@ -15,6 +17,8 @@ const t = 'curl --user "acc_0b07c630e848c34:8c9a207bba31b0f9d409f8569ef22b9e" "h
 export class AiLogicService {
     constructor(
         private httpService: HttpService,
+        private itemService: ItemService,
+        private prismaService: PrismaService
     ) { }
 
     async checkFunc() {
@@ -22,23 +26,29 @@ export class AiLogicService {
         console.log(response.data);
     }
 
-    async getTagsFromApi(url: string, imageId: string) {
-        const response = await this.httpService.get(url, {
-            headers: {
-                authorization: `${authHeader}`
-            },
-            params: {
-                image_upload_id: imageId
-            }
-        })
-        return await (lastValueFrom(response)).then(res => res.data.result.tags[0].tag.en)
+    async getTagsFromApi(url: string, imageId: string): Promise<any> {
+        try {
+            const response = await this.httpService.axiosRef.get(url, {
+                headers: {
+                    authorization: `${authHeader}`
+                },
+                params: {
+                    image_upload_id: imageId
+                }
+            })
+            console.log(JSON.stringify(response.data));
+            console.log(JSON.stringify(response.data.result));
+            return await this.itemService.getItemsAndMaterialsForAi(response.data.result.tags[0].tag.en);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
 
 
     async sendImageToApi(url: string, image: Express.Multer.File) {
         console.log(image.path)
         const formData = new FormData();
-
         const imageStream = fs.readFileSync(image.path)
 
         formData.append('image', imageStream, image.originalname)
@@ -55,18 +65,12 @@ export class AiLogicService {
             console.log('gijdanul Xasbik')
             console.log(uploadId)
 
+            return await this.getTagsFromApi(`https://api.imagga.com/v2/tags`, uploadId);
 
-            return {
-                message: 'Upload successful',
-                uploadId: uploadId
-            }
         } catch (error) {
             console.log(error);
         }
 
-        // console.log(`image id is ${imageId}`)
-        // const objectFromApi = await this.getTagsFromApi(`https://api.imagga.com/v2/tags`, imageId)
-        // console.log(`image id is ${imageId}, object from api is ${objectFromApi}`)
     }
 
 }

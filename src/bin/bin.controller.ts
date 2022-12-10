@@ -1,55 +1,69 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { Bin } from '@prisma/client';
 import { BinService } from './bin.service';
-import { CreateBinTypeDto } from './dto/create-bin-type.dto';
-import { CreateBinDto } from './dto/create-bin.dto';
-import { UpdateBinDto } from './dto/update-bin.dto';
 
 @Controller('bin')
 export class BinController {
-  constructor(private readonly binService: BinService) {}
+  constructor(private readonly binService: BinService) { }
 
-  @Post()
-  async create(@Body() postData: {long: number, lat: number, binTypeId: number, materialId: number}) {
-    const {long, lat, binTypeId, materialId} = postData;
-    return this.binService.createBin(
+  @Post('bin')
+  async createBin(@Body() postData: {
+    long: number, lat: number,
+    binTypeId: number
+  }) {
+    const { long, lat, binTypeId} = postData;
+    return await this.binService.createBin(
       {
         long,
         lat,
         binType: {
           connect: {
             id: binTypeId
-        }
-      },
-      material: {
-        connect: {
-          id: materialId
-        }
+          }
+        },
       }
-    }
     );
   }
 
-  @Post()
-  createBinType(@Body() createBinTypeDto: CreateBinTypeDto) {
-    return this.binService.createBinType(createBinTypeDto);
+  @Post('binType')
+  async createBinType(@Body() postData: {
+    name: string
+  }) {
+    const { name } = postData;
+    return await this.binService.createBinType({
+      name
+    });
   }
 
-  @Get()
-  findAll() {
+  @Post('bin-generate')
+  async generateBinsReady() {
+    return await this.binService.generateBinsReady();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Post('google-maps')
+  async googleMaps(@Body() postData: {
+    materialId: number
+  }) {
+    const { materialId } = postData;
+    return await this.binService.googleMaps(materialId);
+  }
+  @Get('binType')
+  async findAllBinTypes() {
+    return await this.binService.findAllBinTypes();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBinDto: UpdateBinDto) {
-    return this.binService.update(+id, updateBinDto);
+  @Get('bin')
+  async findAllBins() {
+    return await this.binService.findAllBins();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.binService.remove(+id);
+  @Delete('bin/:id')
+  async deleteBin(@Param('id') id: number) {
+    return await this.binService.deleteBin(id);
+  }
+
+  @Delete('binType/:id')
+  async deleteBinType(@Param('id') id: number) {
+    return await this.binService.deleteBinType(id);
   }
 }

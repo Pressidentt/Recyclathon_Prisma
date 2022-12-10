@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
-import { UpdateBinDto } from './dto/update-bin.dto';
+
+const CURLAT = '40.41327'
+const CURLONG = '49.85494'
+
+// BIN and BINTYPE LOGIC
 
 @Injectable()
 export class BinService {
@@ -10,22 +14,94 @@ export class BinService {
   ) { }
 
   async createBin(data: Prisma.BinCreateInput) {
-    return this.prisma.bin.create({ data });
+    return await this.prisma.bin.create({ data });
   }
 
   async createBinType(data: Prisma.BinTypeCreateInput) {
-    return this.prisma.binType.create({ data });
+    return await this.prisma.binType.create({ data });
   }
 
-  findAllBinTypes() {
-    return this.prisma.binType.findMany();
+  async generateBinsReady() {
+    const binTypes = await this.prisma.binType.findMany();
+    for (let i = 0; i < binTypes.length; i++) {
+      const arr = this.geoDataGeneratorReady();
+      for (let j = 0; j < arr.length; j++) {
+        let bin = await this.prisma.bin.create({
+          data: {
+            lat: arr[j].lat,
+            long: arr[j].long,
+            binType: {
+              connect: {
+                id: binTypes[i].id
+              }
+            },
+          }
+        }
+        )
+        console.log(bin);
+      }
+    }
   }
 
-  update(id: number, updateBinDto: UpdateBinDto) {
-    return `This action updates a #${id} bin`;
+  geoDataGeneratorReady() {
+    const lt = CURLAT;
+    const lg = CURLONG;
+    const arr = [];
+
+    for (let i = 0; i < 5; i++) {
+      let changeNumbersLt = Math.floor(Math.random() * 97) + 1;
+      let changeNumbersLg = Math.floor(Math.random() * 97) + 1;
+      let newLt = `${lt.slice(0, 6)}` + `${changeNumbersLt}`;
+      let newLg = `${lg.slice(0, 6)}` + `${changeNumbersLg}`;
+      let coordinates = {
+        "lat": Number(newLt),
+        "long": Number(newLg)
+      }
+      arr.push(coordinates);
+    }
+    console.log(arr);
+    return arr;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bin`;
+  async googleMaps(materialId: number) {
+    let material = await this.prisma.material.findUnique({
+      where: {
+        id: materialId
+      }
+    });
+    const binType = await this.prisma.binType.findUnique({
+      where: {
+        name: material.name
+      }
+    });
+    return await this.prisma.bin.findMany({
+      where: {
+        binTypeId: binType.id
+      }
+    });
+  }
+
+  async findAllBinTypes() {
+    return await this.prisma.binType.findMany();
+  }
+
+  async findAllBins() {
+    return await this.prisma.bin.findMany();
+  }
+
+  async deleteBin(id: number) {
+    return await this.prisma.bin.delete({
+      where: {
+        id
+      }
+    });
+  }
+
+  async deleteBinType(id: number) {
+    return await this.prisma.binType.delete({
+      where: {
+        id
+      }
+    });
   }
 }

@@ -1,33 +1,56 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ItemService } from './item.service';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
 
 @Controller('item')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(private readonly itemService: ItemService) { }
 
-  @Post()
-  create(@Body() createItemDto: CreateItemDto) {
+  @Post('item')
+  async createItem(@Body() postData: {
+    name: string,
+    description: string,
+    materialId: number,
+  }) {
+    const { name, description, materialId } = postData;
+    return await this.itemService.createItem({
+      name,
+      description,
+      material: {
+        connect: {
+          id: materialId
+        }
+      }
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.itemService.findAll();
+  @Post('material')
+  async createMaterial(@Body() postData: {
+    name: string,
+  }) {
+    const { name } = postData;
+    return await this.itemService.createMaterial({
+      name,
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemService.findOne(+id);
+  @Get('item')
+  async findAllItems() {
+    return await this.itemService.itemFindAll();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-    return this.itemService.update(+id, updateItemDto);
+  @Get('material')
+  async findAllMaterials() {
+    return this.itemService.materialFindAll();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemService.remove(+id);
+  @Delete('item/:id')
+  async deleteItem(@Param('id') id: number) {
+    return await this.itemService.deleteItem(id);
   }
+
+  @Delete('material/:id')
+  async deleteMaterial(@Param('id') id: number) {
+    return await this.itemService.deleteMaterial(id);
+  }
+
 }

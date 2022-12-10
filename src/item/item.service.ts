@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
-import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+
+
+// ITEM AND MATERIAL LOGIC
 
 @Injectable()
 export class ItemService {
@@ -10,22 +12,63 @@ export class ItemService {
     private prisma: PrismaService
   ) { }
   async createItem(data: Prisma.ItemCreateInput) {
-    await this.prisma.item.create({ data });
+    return await this.prisma.item.create({ data });
   }
 
-  async findAll() {
-    await this.prisma.item.findMany();
+  async createMaterial(data: Prisma.MaterialCreateInput) {
+    return await this.prisma.material.create({ data });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async getPreparedItems(name: string) {
+    return await this.prisma.item.findMany({
+      include: {
+        material: true
+      }
+    });
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
-  }
+  async getItemsAndMaterialsForAi(item_quess: string) {
+    console.log('DOshel go itema')
+    console.log('item_quess: ', item_quess);
+    const items = await this.prisma.item.findMany({
+      include: {
+        material: true
+      }
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+    const ar = item_quess.toLowerCase().split(' ');
+    console.log('ar: ', ar);
+    // Проверяю есть ли в названии предмета слово, которое ввел пользователь
+    for (let i = 0; i < items.length; i++) {
+      if (ar.includes(items[i].name.toLowerCase())) {
+        return items[i]; 
+        }
+      }
+      console.log('YA NE srabotal')
+    }
+
+  // Testing functions
+  async itemFindAll() {
+      return await this.prisma.item.findMany();
+    }
+
+  async materialFindAll() {
+      return await this.prisma.material.findMany();
+    }
+
+  async deleteItem(id: number) {
+      return await this.prisma.item.delete({
+        where: {
+          id: id
+        }
+      });
+    }
+
+  async deleteMaterial(id: number) {
+      return await this.prisma.material.delete({
+        where: {
+          id: id
+        }
+      });
+    }
   }
-}

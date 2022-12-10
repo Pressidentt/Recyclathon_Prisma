@@ -17,31 +17,30 @@ model User {
 }
 
 model BinType {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  bins        Bin[]
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  bins       Bin[]
 }
 
 model Bin {
-  id   Int     @id @default(autoincrement())
-  long Float
-  lat  Float 
-  binType BinType? @relation(fields: [binTypeId], references: [id])
-  binTypeId Int
-  material Material? @relation(fields: [materialId], references: [id])
-  materialId Int
+  id         Int       @id @default(autoincrement())
+  long       Float
+  lat        Float
+  binType    BinType?  @relation(fields: [binTypeId], references: [id])
+  binTypeId  Int
 }
 
 model Item {
-  id   Int     @id @default(autoincrement())
-  name String
-  material Material @relation(fields: [materialId], references: [id])
-  materialId Int
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  material    Material @relation(fields: [materialId], references: [id])
+  materialId  Int
+  imageUrl    String?
 }
 
 model Material {
-  id   Int     @id @default(autoincrement())
-  name String
-  items Item[]
-  bins Bin[]
+  id      Int       @id @default(autoincrement())
+  name    String
+  items   Item[]
 }
