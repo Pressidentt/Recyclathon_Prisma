@@ -66,4 +66,9 @@ export class BinController {
   async deleteBinType(@Param('id') id: number) {
     return await this.binService.deleteBinType(id);
   }
+  
+  @Delete('delete-bin-all')
+  async deleteAllBins() {
+    return await this.binService.binsDelete();
+  }
 }

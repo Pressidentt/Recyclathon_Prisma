@@ -49,10 +49,10 @@ export class BinService {
     const arr = [];
 
     for (let i = 0; i < 5; i++) {
-      let changeNumbersLt = Math.floor(Math.random() * 97) + 1;
-      let changeNumbersLg = Math.floor(Math.random() * 97) + 1;
-      let newLt = `${lt.slice(0, 6)}` + `${changeNumbersLt}`;
-      let newLg = `${lg.slice(0, 6)}` + `${changeNumbersLg}`;
+      let changeNumbersLt = Math.floor(Math.random() * 970) + 1;
+      let changeNumbersLg = Math.floor(Math.random() * 970) + 1;
+      let newLt = `${lt.slice(0, 5)}` + `${changeNumbersLt}`;
+      let newLg = `${lg.slice(0, 5)}` + `${changeNumbersLg}`;
       let coordinates = {
         "lat": Number(newLt),
         "long": Number(newLg)
@@ -79,6 +79,17 @@ export class BinService {
         binTypeId: binType.id
       }
     });
+  }
+
+  async binsDelete() {
+    const bins = await this.prisma.bin.findMany();
+    for (let i = 0; i < bins.length; i++) {
+      await this.prisma.bin.delete({
+        where: {
+          id: bins[i].id
+        }
+      })
+    }
   }
 
   async findAllBinTypes() {
