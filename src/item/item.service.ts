@@ -41,34 +41,55 @@ export class ItemService {
     // Проверяю есть ли в названии предмета слово, которое ввел пользователь
     for (let i = 0; i < items.length; i++) {
       if (ar.includes(items[i].name.toLowerCase())) {
-        return items[i]; 
+        return items[i];
+      }
+    }
+    return await this.prisma.item.create({
+      data: {
+        name: item_quess,
+        description: 'Recyclable',
+        material: {
+          connect: {
+            id: 5
+          }
         }
       }
-      console.log('YA NE srabotal')
-    }
+    })
+  }
 
   // Testing functions
   async itemFindAll() {
-      return await this.prisma.item.findMany();
-    }
+    return await this.prisma.item.findMany();
+  }
 
   async materialFindAll() {
-      return await this.prisma.material.findMany();
-    }
+    return await this.prisma.material.findMany();
+  }
 
   async deleteItem(id: number) {
-      return await this.prisma.item.delete({
-        where: {
-          id: id
-        }
-      });
-    }
+    return await this.prisma.item.delete({
+      where: {
+        id: id
+      }
+    });
+  }
 
   async deleteMaterial(id: number) {
-      return await this.prisma.material.delete({
-        where: {
-          id: id
-        }
-      });
-    }
+    return await this.prisma.material.delete({
+      where: {
+        id: id
+      }
+    });
   }
+
+  async getByIdItem(id: number) {
+    return await this.prisma.item.findUnique({
+      where: {
+        id: id
+      },
+      include: {
+        material: true
+      }
+    });
+  }
+}

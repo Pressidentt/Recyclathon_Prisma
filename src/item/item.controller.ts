@@ -33,6 +33,11 @@ export class ItemController {
     });
   }
 
+  @Get('item/:id')
+  async getItem(@Param('id') id: number) {
+    return await this.itemService.getByIdItem(id);
+  }
+
   @Get('item')
   async findAllItems() {
     return await this.itemService.itemFindAll();
