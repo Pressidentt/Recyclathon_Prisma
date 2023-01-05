@@ -6,13 +6,6 @@ import * as FormData from 'form-data'
 import { ItemService } from '../item/item.service';
 import { PrismaService } from '../prisma.service';
 
-const PUBLIC_KEY = ''
-const PRIVATE_KEY = ''
-const authHeader = 'Basic YWNjXzBiMDdjNjMwZTg0OGMzNDo4YzlhMjA3YmJhMzFiMGY5ZDQwOWY4NTY5ZWYyMmI5ZQ=='
-const t = 'curl --user "acc_0b07c630e848c34:8c9a207bba31b0f9d409f8569ef22b9e" "https://api.imagga.com/v2/tags?image_url=https://imagga.com'
-'static/images/tagging/wind-farm-538576_640.jpg"'
-
-
 @Injectable()
 export class AiLogicService {
     constructor(
